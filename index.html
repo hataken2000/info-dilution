@@ -3,499 +3,784 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>情報の希釈化 — 実データで見るAIコンテンツ汚染</title>
+<title>AIコンテンツの増加とウェブ情報品質に関する調査レポート</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    background: #0a0a0f;
-    color: #e0e0e0;
-    line-height: 1.6;
+    font-family: 'Helvetica Neue', 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif;
+    background: #f7f7f5;
+    color: #1a1a1a;
+    line-height: 1.75;
+    font-size: 15px;
   }
 
-  .hero {
-    min-height: 100vh;
+  /* HEADER */
+  .site-header {
+    background: #fff;
+    border-bottom: 1px solid #e5e5e0;
+    padding: 0 40px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-    text-align: center;
-    padding: 40px 20px;
-    position: relative;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .site-header .logo {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+  }
+  .site-header .logo span { color: #888; font-weight: 400; }
+  .header-tag {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.05em;
+  }
+
+  /* COVER */
+  .cover {
+    background: #fff;
+    border-bottom: 1px solid #e5e5e0;
+    padding: 72px 40px 64px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .cover-category {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .cover h1 {
+    font-size: clamp(26px, 3.5vw, 40px);
+    font-weight: 700;
+    line-height: 1.3;
+    color: #111;
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+  }
+  .cover-sub {
+    font-size: 16px;
+    color: #555;
+    max-width: 600px;
+    margin-bottom: 40px;
+    line-height: 1.7;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    padding-top: 24px;
+    border-top: 1px solid #e5e5e0;
+  }
+  .meta-item { font-size: 12px; color: #999; }
+  .meta-item strong { color: #444; display: block; margin-bottom: 2px; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* KEY FINDINGS */
+  .findings-bar {
+    background: #1a1a2e;
+    padding: 32px 40px;
+  }
+  .findings-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .findings-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: #6b7db3;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .findings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 32px;
+  }
+  .finding-item {}
+  .finding-num {
+    font-size: 40px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .finding-desc { font-size: 12px; color: #8899bb; line-height: 1.5; }
+  .finding-source { font-size: 10px; color: #445; margin-top: 4px; font-style: italic; }
+
+  /* LAYOUT */
+  .report-body {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* SECTION */
+  .report-section {
+    padding: 60px 0;
+    border-bottom: 1px solid #e5e5e0;
+  }
+  .section-num {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: #bbb;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .report-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .report-section .lead {
+    font-size: 15px;
+    color: #555;
+    margin-bottom: 36px;
+    max-width: 640px;
+  }
+
+  /* CHART CONTAINER */
+  .chart-box {
+    background: #fff;
+    border: 1px solid #e5e5e0;
+    border-radius: 6px;
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 4px;
+  }
+  .chart-subtitle {
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 24px;
+  }
+  .chart-source {
+    font-size: 10px;
+    color: #bbb;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0ee;
+  }
+
+  /* BAR CHARTS */
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .bar-label {
+    font-size: 11px;
+    color: #666;
+    width: 120px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .bar-track {
+    flex: 1;
+    height: 24px;
+    background: #f5f5f3;
+    border-radius: 3px;
     overflow: hidden;
+    position: relative;
   }
-  .hero::before {
-    content: '';
+  .bar-fill-red {
+    height: 100%;
+    background: #d94f3d;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 11px;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 3px;
+    white-space: nowrap;
+    transition: width 1s ease;
+  }
+  .bar-val {
+    font-size: 12px;
+    color: #d94f3d;
+    font-weight: 600;
+    width: 50px;
+    flex-shrink: 0;
+  }
+
+  /* SPLIT BAR */
+  .split-bar-track {
+    height: 20px;
+    background: #f0f0ee;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 6px;
+  }
+  .split-human {
+    height: 100%;
+    background: #3a7d5c;
     position: absolute;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(255,50,50,0.07) 0%, transparent 70%);
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    animation: pulse 4s ease-in-out infinite;
+    left: 0;
+    transition: width 0.5s ease;
   }
-  @keyframes pulse { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.3)} }
-
-  .hero-label { font-size: 12px; letter-spacing: 4px; color: #ff4444; text-transform: uppercase; margin-bottom: 24px; }
-  .hero h1 {
-    font-size: clamp(36px, 6vw, 72px);
-    font-weight: 800; line-height: 1.1; margin-bottom: 24px;
-    background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  .split-ai {
+    height: 100%;
+    background: #d94f3d;
+    position: absolute;
+    transition: all 0.5s ease;
   }
-  .hero p { font-size: 18px; color: #888; max-width: 560px; margin-bottom: 60px; }
-
-  .stat-row { display: flex; gap: 48px; flex-wrap: wrap; justify-content: center; }
-  .stat-item { text-align: center; max-width: 200px; }
-  .stat-num { font-size: 52px; font-weight: 900; color: #ff4444; display: block; line-height: 1; }
-  .stat-desc { font-size: 13px; color: #666; margin-top: 6px; }
-  .stat-source { font-size: 10px; color: #333; margin-top: 4px; font-style: italic; }
-
-  .scroll-hint {
-    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    color: #444; font-size: 12px; animation: bounce 2s ease-in-out infinite;
+  .split-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 20px;
   }
-  .scroll-hint::after { content: '↓'; font-size: 20px; }
-  @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
-
-  section { max-width: 900px; margin: 0 auto; padding: 80px 24px; }
-  .section-label { font-size: 11px; letter-spacing: 3px; color: #ff4444; text-transform: uppercase; margin-bottom: 12px; }
-  section h2 { font-size: clamp(24px, 4vw, 40px); font-weight: 700; margin-bottom: 16px; color: #fff; }
-  section > p { color: #888; font-size: 16px; margin-bottom: 40px; }
+  .split-labels .h { color: #3a7d5c; }
+  .split-labels .a { color: #d94f3d; }
 
   /* SLIDER */
-  .year-display { text-align: center; font-size: 64px; font-weight: 900; color: #fff; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  .slider-wrap { margin-bottom: 24px; }
+  .slider-year {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 8px;
+  }
   input[type=range] {
-    width: 100%; -webkit-appearance: none; height: 4px; background: #222; border-radius: 2px; outline: none; cursor: pointer;
+    width: 100%;
+    -webkit-appearance: none;
+    height: 3px;
+    background: #e0e0dc;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
   }
   input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #ff4444; cursor: pointer;
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #1a1a2e;
+    cursor: pointer;
   }
-  .year-labels { display: flex; justify-content: space-between; color: #444; font-size: 12px; margin-top: 8px; }
-  .year-slider-wrap { margin-bottom: 32px; }
-
-  .data-note {
-    font-size: 11px; color: #333; margin-top: 8px; text-align: center;
-    border: 1px solid #1a1a1a; border-radius: 6px; padding: 6px 12px; display: inline-block;
+  .slider-ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #bbb;
+    margin-top: 6px;
   }
-  .data-note a { color: #444; }
-
-  /* QUALITY BAR */
-  .quality-bar-wrap { background: #111; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
-  .quality-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: #555; margin-bottom: 8px; }
-  .quality-bar-track { height: 12px; background: #1a1a1a; border-radius: 6px; overflow: hidden; position: relative; }
-  .quality-bar-human {
-    height: 100%; background: linear-gradient(90deg, #4ade80, #22c55e);
-    border-radius: 6px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); position: absolute; left: 0;
+  .data-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
   }
-  .quality-bar-ai {
-    height: 100%; background: linear-gradient(90deg, #f87171, #ef4444);
-    border-radius: 6px; transition: all 0.6s cubic-bezier(0.4,0,0.2,1); position: absolute;
+  .data-badge.measured { background: #e8f3ec; color: #3a7d5c; }
+  .data-badge.estimated { background: #f5f0e8; color: #a06030; }
+
+  /* SEARCH RESULTS */
+  .result-list { display: flex; flex-direction: column; gap: 12px; }
+  .result-item {
+    padding: 14px 16px;
+    border-radius: 4px;
+    border: 1px solid #e5e5e0;
+    background: #fff;
+    position: relative;
   }
-  .bar-percent { display: flex; justify-content: space-between; font-size: 13px; margin-top: 8px; }
-  .bar-percent .h { color: #4ade80; }
-  .bar-percent .a { color: #f87171; }
-
-  /* SEARCH BOX */
-  .search-box { background: #111; border: 1px solid #222; border-radius: 12px; padding: 20px; }
-  .search-query { font-size: 13px; color: #555; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #1a1a1a; }
-  .search-query span { color: #888; }
-  .result-list { display: flex; flex-direction: column; gap: 16px; }
-  .result-item { padding: 14px; border-radius: 8px; border: 1px solid #1e1e1e; transition: all 0.4s ease; position: relative; overflow: hidden; }
-  .result-item.human { border-color: #14532d; background: rgba(20,83,45,0.08); }
-  .result-item.ai-gen { border-color: #7f1d1d; background: rgba(127,29,29,0.08); }
-  .result-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-  .human .result-badge { background: rgba(74,222,128,0.15); color: #4ade80; }
-  .ai-gen .result-badge { background: rgba(248,113,113,0.15); color: #f87171; }
-  .result-title { font-size: 15px; font-weight: 600; color: #c0c0ff; margin-bottom: 4px; }
-  .result-url { font-size: 11px; color: #444; margin-bottom: 6px; }
-  .result-desc { font-size: 13px; color: #666; line-height: 1.5; }
-  .human .result-desc { color: #888; }
-
-  /* NEWSGUARD CHART */
-  .ng-chart { display: flex; flex-direction: column; gap: 14px; }
-  .ng-row { display: flex; align-items: center; gap: 16px; }
-  .ng-date { font-size: 12px; color: #555; width: 100px; flex-shrink: 0; text-align: right; }
-  .ng-bar-wrap { flex: 1; height: 28px; background: #111; border-radius: 6px; overflow: hidden; position: relative; }
-  .ng-bar-fill {
-    height: 100%; background: linear-gradient(90deg, #f87171, #ef4444);
-    display: flex; align-items: center; padding-left: 10px;
-    font-size: 12px; color: rgba(255,255,255,0.9); font-weight: 600;
-    border-radius: 6px; transition: width 1.2s ease;
-    white-space: nowrap;
+  .result-item.human { border-left: 3px solid #3a7d5c; }
+  .result-item.ai-gen { border-left: 3px solid #d94f3d; }
+  .result-badge {
+    display: inline-block;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 2px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
-  .ng-num { font-size: 13px; color: #f87171; font-weight: 700; width: 60px; flex-shrink: 0; }
+  .human .result-badge { background: #e8f3ec; color: #2d6347; }
+  .ai-gen .result-badge { background: #fcecea; color: #b03a2a; }
+  .result-title { font-size: 14px; font-weight: 600; color: #1a4fa0; margin-bottom: 3px; }
+  .result-url { font-size: 10px; color: #999; margin-bottom: 5px; }
+  .result-desc { font-size: 12px; color: #666; line-height: 1.55; }
 
-  /* MODEL COLLAPSE */
-  .gen-rows { display: flex; flex-direction: column; gap: 14px; }
-  .gen-row { display: flex; align-items: center; gap: 16px; }
-  .gen-label { font-size: 11px; color: #555; width: 60px; flex-shrink: 0; text-align: right; white-space: pre-line; }
-  .gen-bar-wrap { flex: 1; height: 32px; background: #111; border-radius: 6px; overflow: hidden; position: relative; }
-  .gen-human-fill {
-    height: 100%; background: linear-gradient(90deg, #4ade80, #22c55e);
-    position: absolute; left: 0; display: flex; align-items: center; padding-left: 8px;
-    font-size: 11px; color: rgba(255,255,255,0.8); white-space: nowrap;
+  /* GEN COLLAPSE */
+  .gen-table { width: 100%; border-collapse: collapse; }
+  .gen-table th {
+    text-align: left;
+    font-size: 10px;
+    color: #aaa;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border-bottom: 1px solid #e5e5e0;
+    font-weight: 600;
   }
-  .gen-ai-fill {
-    height: 100%; background: linear-gradient(90deg, #f87171, #ef4444);
-    position: absolute; display: flex; align-items: center; justify-content: flex-end;
-    padding-right: 8px; font-size: 11px; color: rgba(255,255,255,0.8); white-space: nowrap;
+  .gen-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0ee; vertical-align: middle; }
+  .gen-table tr:last-child td { border-bottom: none; }
+  .gen-name { font-size: 12px; color: #444; font-weight: 600; }
+  .gen-bar-cell { width: 50%; }
+  .gen-mini-track { height: 14px; background: #f5f5f3; border-radius: 2px; overflow: hidden; position: relative; }
+  .gen-mini-h { height: 100%; background: #3a7d5c; position: absolute; left: 0; }
+  .gen-mini-a { height: 100%; background: #d94f3d; position: absolute; }
+  .gen-status-cell { font-size: 11px; white-space: nowrap; }
+  .status-ok { color: #3a7d5c; }
+  .status-warn { color: #b07030; }
+  .status-bad { color: #d94f3d; }
+
+  /* NOTE BOX */
+  .note-box {
+    background: #f9f8f5;
+    border: 1px solid #e5e5e0;
+    border-left: 3px solid #aaa;
+    border-radius: 3px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.7;
+    margin-top: 16px;
   }
-  .gen-status { font-size: 12px; color: #555; width: 80px; flex-shrink: 0; text-align: right; }
-  .gen-status.bad { color: #f87171; }
-  .gen-status.warn { color: #fbbf24; }
-  .gen-status.good { color: #4ade80; }
+  .note-box strong { color: #333; }
 
-  /* TIMELINE */
-  .timeline { position: relative; padding-left: 24px; border-left: 2px solid #1a1a1a; }
-  .timeline-item { position: relative; padding: 20px 0 20px 24px; }
-  .timeline-item::before { content: ''; position: absolute; left: -7px; top: 28px; width: 12px; height: 12px; border-radius: 50%; background: #ff4444; border: 2px solid #0a0a0f; }
-  .timeline-year { font-size: 11px; color: #ff4444; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; }
-  .timeline-event { font-size: 15px; color: #ccc; font-weight: 600; margin-bottom: 4px; }
-  .timeline-desc { font-size: 13px; color: #555; }
-  .timeline-source { font-size: 11px; color: #333; margin-top: 4px; font-style: italic; }
+  /* SEO STAT GRID */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: #fff;
+    border: 1px solid #e5e5e0;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-card .num { font-size: 38px; font-weight: 700; color: #d94f3d; line-height: 1; margin-bottom: 6px; }
+  .stat-card .desc { font-size: 12px; color: #666; line-height: 1.4; }
+  .stat-card .src { font-size: 10px; color: #bbb; margin-top: 6px; font-style: italic; }
 
-  /* INFO BOX */
-  .info-box { padding: 20px; background: #0d0d12; border: 1px solid #1a1a1a; border-radius: 8px; font-size: 13px; color: #555; line-height: 2; }
-  .info-box strong { color: #ccc; }
-  .info-box .highlight { color: #ff4444; font-weight: 700; }
+  /* CONCLUSION */
+  .conclusion-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .conclusion-list li {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #e5e5e0;
+    border-radius: 4px;
+  }
+  .conclusion-list li .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .conclusion-list li .text { font-size: 13px; color: #444; line-height: 1.6; }
+  .conclusion-list li .text strong { color: #111; display: block; margin-bottom: 2px; font-size: 14px; }
 
   /* SOURCES */
   .sources-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources-list li { font-size: 12px; color: #444; padding: 10px 14px; background: #0d0d12; border: 1px solid #1a1a1a; border-radius: 6px; }
-  .sources-list li strong { color: #666; }
-  .sources-list li a { color: #4444aa; text-decoration: none; word-break: break-all; }
-  .sources-list li a:hover { color: #6666cc; }
+  .sources-list li {
+    font-size: 12px;
+    color: #666;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #e5e5e0;
+    border-radius: 3px;
+  }
+  .sources-list li strong { color: #333; display: block; margin-bottom: 2px; }
+  .sources-list li a { color: #1a4fa0; text-decoration: none; word-break: break-all; }
+  .sources-list li a:hover { text-decoration: underline; }
 
-  /* CARDS */
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 32px; }
-  .card { background: #0d1a0d; border: 1px solid #14532d; border-radius: 12px; padding: 24px; }
-  .card-icon { font-size: 24px; margin-bottom: 12px; }
-  .card-title { font-weight: 700; color: #4ade80; margin-bottom: 8px; }
-  .card-desc { font-size: 13px; color: #555; }
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 48px 40px;
+    color: #bbb;
+    font-size: 12px;
+    border-top: 1px solid #e5e5e0;
+    margin-top: 0;
+    background: #fff;
+  }
 
-  .divider { height: 1px; background: linear-gradient(90deg, transparent, #1a1a1a, transparent); margin: 0 24px; }
+  .divider { height: 1px; background: #e5e5e0; }
 
-  footer { text-align: center; padding: 60px 24px; color: #333; font-size: 13px; border-top: 1px solid #111; }
-  footer strong { color: #555; }
+  @media (max-width: 600px) {
+    .cover, .report-body { padding-left: 20px; padding-right: 20px; }
+    .findings-bar { padding: 24px 20px; }
+    .site-header { padding: 0 20px; }
+  }
 </style>
 </head>
 <body>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-label">実データで見る情報汚染</div>
-  <h1>検索結果が<br>壊れていく</h1>
-  <p>AIが生成した薄いコンテンツが、人間が書いた知識を埋め尽くしている。<br>仮説ではない。計測された事実だ。</p>
-  <div class="stat-row">
-    <div class="stat-item">
-      <span class="stat-num" id="counter1">0</span>
-      <div class="stat-desc">新規ウェブページのAI混入率<br>（2025年4月 / 90万ページ調査）</div>
-      <div class="stat-source">出典：Ahrefs 2025年5月</div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num" id="counter2">0</span>
-      <div class="stat-desc">AIニュースサイト数の増加<br>（2023年5月 49件 → 2026年3月 3,006件）</div>
-      <div class="stat-source">出典：NewsGuard AI Tracking Center</div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num" id="counter3">0</span>
-      <div class="stat-desc">Google検索上位のAI記事割合<br>（2025年7月 / 2019年は2.27%）</div>
-      <div class="stat-source">出典：Originality.ai 継続調査</div>
-    </div>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">情報品質調査レポート <span>2026年4月</span></div>
+  <div class="header-tag">DATA · RESEARCH · ANALYSIS</div>
+</header>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-category">Research Report</div>
+  <h1>AIコンテンツの増加がウェブ上の<br>情報品質に与える影響</h1>
+  <p class="cover-sub">
+    2019年以降、検索エンジン上位に占めるAI生成コンテンツの割合は急増している。本レポートでは、Originality.ai・Ahrefs・NewsGuardなど複数の実測データをもとに、この変化の現状と構造的な問題を整理する。
+  </p>
+  <div class="cover-meta">
+    <div class="meta-item"><strong>作成日</strong>2026年4月23日</div>
+    <div class="meta-item"><strong>対象期間</strong>2019年〜2026年</div>
+    <div class="meta-item"><strong>主要データソース</strong>Originality.ai / Ahrefs / NewsGuard / Nature (2024)</div>
+    <div class="meta-item"><strong>注記</strong>シミュレーション部分を含む。各節に明示。</div>
   </div>
-  <div class="scroll-hint">スクロールして体験</div>
 </div>
 
-<div class="divider"></div>
-
-<!-- NEWSGUARD CHART -->
-<section>
-  <div class="section-label">NewsGuard 実測データ</div>
-  <h2>AIニュースサイトが<br>3年で61倍になった</h2>
-  <p>NewsGuardが継続追跡しているAI生成コンテンツファームの実測値。2023年5月の観測開始からの推移。</p>
-
-  <div class="ng-chart" id="ngChart"></div>
-
-  <div style="margin-top: 24px;">
-    <div class="info-box">
-      現在の増加ペース：<strong class="highlight">月300〜500サイト</strong><br>
-      対象：ほぼ人間の監督なしにAIが生成した記事を大量公開しているサイト（16言語で追跡中）<br>
-      <span style="font-size:11px; color:#333; margin-top:8px; display:block;">出典：NewsGuard「AI Tracking Center」— newsguardtech.com/special-reports/ai-tracking-center/</span>
+<!-- KEY FINDINGS -->
+<div class="findings-bar">
+  <div class="findings-inner">
+    <div class="findings-label">Key Findings</div>
+    <div class="findings-grid">
+      <div class="finding-item">
+        <div class="finding-num" id="c1">—</div>
+        <div class="finding-desc">新規ウェブページのAI混入率<br>（90万ページ調査 / 2025年4月）</div>
+        <div class="finding-source">出典：Ahrefs, 2025年5月</div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-num" id="c2">—</div>
+        <div class="finding-desc">AIニュースサイト数の増加倍率<br>（49件→3,006件 / 2023年5月〜2026年3月）</div>
+        <div class="finding-source">出典：NewsGuard AI Tracking Center</div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-num" id="c3">—</div>
+        <div class="finding-desc">Google検索上位のAI記事割合<br>（2025年7月 / 2019年は2.27%）</div>
+        <div class="finding-source">出典：Originality.ai 継続調査</div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-num" id="c4">—</div>
+        <div class="finding-desc">HCU後のサイト平均トラフィック減少率<br>（7,105サイト対象）</div>
+        <div class="finding-source">出典：Paul Teitelman, 2024年</div>
+      </div>
     </div>
   </div>
-</section>
+</div>
 
-<div class="divider"></div>
+<div class="report-body">
 
-<!-- SEARCH SIMULATOR -->
-<section>
-  <div class="section-label">Originality.ai 実測データ × シミュレーション</div>
-  <h2>Google検索上位のAI記事割合<br>年を動かして確認せよ</h2>
-  <p>棒グラフはOriginality.aiが500の人気キーワードから上位20件を計測した実測値。検索結果の例は傾向を示すシミュレーションで、架空の記事タイトルを使用している。</p>
+  <!-- SECTION 1: NewsGuard -->
+  <div class="report-section">
+    <div class="section-num">Section 1</div>
+    <h2>AIコンテンツファームの急増</h2>
+    <p class="lead">
+      NewsGuardは2023年5月から、ほぼ人間の監督なしにAIが大量の記事を生成・公開するサイトを継続追跡している。16言語を対象とした実測データを以下に示す。
+    </p>
 
-  <div class="year-slider-wrap">
-    <div class="year-display" id="yearDisplay">2019</div>
-    <input type="range" id="yearSlider" min="0" max="5" value="0" step="1">
-    <div class="year-labels">
-      <span>2019</span>
-      <span>2021</span>
-      <span>2022</span>
-      <span>2023</span>
-      <span>2024/11</span>
-      <span>2025/7</span>
+    <div class="chart-box">
+      <div class="chart-title">AIコンテンツファームサイト数の推移</div>
+      <div class="chart-subtitle">NewsGuard AI Tracking Center — 確認済みサイト数（累計）</div>
+      <div id="ngChart"></div>
+      <div class="chart-source">出典：NewsGuard「AI Tracking Center」 — newsguardtech.com/special-reports/ai-tracking-center/<br>現在の増加ペース：月300〜500サイト（2026年3月時点）</div>
     </div>
-    <div style="text-align:center; margin-top:8px;">
-      <span class="data-note" id="dataNoteBar">実測値</span>
-    </div>
-  </div>
 
-  <div class="quality-bar-wrap">
-    <div class="quality-bar-label">
-      <span>■ 人間が書いた記事（推定）</span>
-      <span>AI生成コンテンツ（実測） ■</span>
-    </div>
-    <div class="quality-bar-track">
-      <div class="quality-bar-human" id="barHuman"></div>
-      <div class="quality-bar-ai" id="barAi"></div>
-    </div>
-    <div class="bar-percent">
-      <span class="h" id="humanPct"></span>
-      <span class="a" id="aiPct"></span>
+    <div class="note-box">
+      <strong>補足：</strong>対象は単純なスパムではなく、ニュース・健康・金融など実用的なカテゴリで人間が書いたように見える記事を大量生成しているサイト。読者が信頼しやすい形式をとっている点が問題として指摘されている。
     </div>
   </div>
 
-  <div class="search-box">
-    <div class="search-query">🔍 <span>糖尿病 初期症状</span>（検索結果の質の変化を示すシミュレーション）</div>
-    <div class="result-list" id="resultList"></div>
-  </div>
-</section>
+  <!-- SECTION 2: Search Simulator -->
+  <div class="report-section">
+    <div class="section-num">Section 2</div>
+    <h2>Google検索上位に占めるAI記事割合の変化</h2>
+    <p class="lead">
+      Originality.aiは500の人気キーワードから上位20件を定期サンプリングし、AI検出スコア0.5以上を「AI生成」と判定している。以下のスライダーで年ごとの変化を確認できる。
+    </p>
 
-<div class="divider"></div>
+    <div class="chart-box">
+      <div class="chart-title">検索上位20件中のAI記事割合（実測・推計）</div>
+      <div class="chart-subtitle">スライダーを動かして年別の変化を確認</div>
 
-<!-- MODEL COLLAPSE -->
-<section>
-  <div class="section-label">Nature 2024 論文より</div>
-  <h2>AIがAIを学習すると<br>9世代で崩壊する</h2>
-  <p>Shumailov et al.（2024）がNature誌に発表した実験結果。AIが生成したデータで再学習を繰り返すと、モデルの出力品質は不可逆的に劣化する。</p>
+      <div class="slider-wrap">
+        <div class="slider-year" id="yearDisplay">2019年</div>
+        <input type="range" id="yearSlider" min="0" max="5" value="0" step="1">
+        <div class="slider-ticks">
+          <span>2019</span><span>2021</span><span>2022</span><span>2023</span><span>2024/11</span><span>2025/7</span>
+        </div>
+      </div>
 
-  <div class="gen-rows" id="genBars"></div>
+      <div id="dataBadge" class="data-badge measured">● 実測値（Originality.ai）</div>
 
-  <div style="margin-top: 32px;">
-    <div class="info-box">
-      <strong>実験の手法：</strong>OPT-125mモデルをwikitext2データで学習（Gen 0）し、各世代の出力を次世代の学習データとして使用。<br><br>
-      <strong>確認された現象：</strong><br>
-      ・<span class="highlight">5世代</span>後：Perplexity（文章の自然さ指標）が20〜28ポイント劣化<br>
-      ・<span class="highlight">9世代</span>後：無意味な文字列（ジベリッシュ）を生成し始める<br>
-      ・稀な専門知識（低確率事象）が最初に消失し、情報が「平均化」される<br><br>
-      <span style="font-size:11px; color:#333;">出典：Shumailov et al. "AI models collapse when trained on recursively generated data" Nature vol.631 pp.755–759 (2024) / DOI: 10.1038/s41586-024-07566-y</span>
-    </div>
-  </div>
-</section>
+      <div class="split-bar-track">
+        <div class="split-human" id="barHuman"></div>
+        <div class="split-ai" id="barAi"></div>
+      </div>
+      <div class="split-labels">
+        <span class="h" id="humanPct"></span>
+        <span class="a" id="aiPct"></span>
+      </div>
 
-<div class="divider"></div>
+      <div class="chart-title" style="margin-bottom:8px;">検索結果の質の変化（シミュレーション）</div>
+      <div class="chart-subtitle" style="margin-bottom:12px;">クエリ「糖尿病 初期症状」を例としたトレンドの再現。記事タイトル・本文は架空。</div>
+      <div class="result-list" id="resultList"></div>
 
-<!-- SEO IMPACT -->
-<section>
-  <div class="section-label">SEO調査データ</div>
-  <h2>専門家コンテンツが<br>埋もれている証拠</h2>
-  <p>Googleの「役立つコンテンツアップデート（HCU）」後のサイトへの影響。皮肉にも、AI記事を排除しようとしたアップデートが、まともなサイトも巻き込んで壊滅させた。</p>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 32px;">
-    <div style="background:#0d0d12; border:1px solid #7f1d1d; border-radius:12px; padding:24px; text-align:center;">
-      <div style="font-size:52px; font-weight:900; color:#f87171; line-height:1;">82%</div>
-      <div style="font-size:13px; color:#555; margin-top:8px;">7,105サイトの平均トラフィック減少率</div>
-      <div style="font-size:11px; color:#333; margin-top:6px; font-style:italic;">Paul Teitelman 6ヶ月調査 (2024)</div>
-    </div>
-    <div style="background:#0d0d12; border:1px solid #7f1d1d; border-radius:12px; padding:24px; text-align:center;">
-      <div style="font-size:52px; font-weight:900; color:#f87171; line-height:1;">22%</div>
-      <div style="font-size:13px; color:#555; margin-top:8px;">調査サイト中「トラフィックが完全にゼロになった」割合</div>
-      <div style="font-size:11px; color:#333; margin-top:6px; font-style:italic;">同調査より</div>
-    </div>
-    <div style="background:#0d0d12; border:1px solid #7f1d1d; border-radius:12px; padding:24px; text-align:center;">
-      <div style="font-size:52px; font-weight:900; color:#f87171; line-height:1;">32%</div>
-      <div style="font-size:13px; color:#555; margin-top:8px;">旅行サイト671件中、トラフィック90%以上消失した割合</div>
-      <div style="font-size:11px; color:#333; margin-top:6px; font-style:italic;">Amsive分析 (2024)</div>
+      <div class="chart-source">出典（比率）：Originality.ai 継続調査 — originality.ai/ai-content-in-google-search-results<br>2021年・2022年・2023年の値は実測値間の線形推計。検索結果の例示はシミュレーション。</div>
     </div>
   </div>
 
-  <div class="info-box">
-    <strong>問題の構造：</strong>AI記事と専門家の記事を機械が区別できないため、アルゴリズムがまとめて弾いてしまう。結果として「本物の専門家が書く意欲を失う」という悪循環が起きている。
-  </div>
-</section>
+  <!-- SECTION 3: Model Collapse -->
+  <div class="report-section">
+    <div class="section-num">Section 3</div>
+    <h2>AIの再帰的学習による品質劣化（モデル崩壊）</h2>
+    <p class="lead">
+      Shumailov et al.（Nature, 2024）は、AIが自身の出力を学習データとして再学習を繰り返した場合の品質変化を実験的に検証した。結果を以下に示す。
+    </p>
 
-<div class="divider"></div>
+    <div class="chart-box">
+      <div class="chart-title">学習データの構成変化と品質劣化（概念図）</div>
+      <div class="chart-subtitle">OPT-125mモデルによる実験 — 世代が進むにつれて人間データの比率が実質的に減少</div>
+      <table class="gen-table">
+        <thead>
+          <tr>
+            <th>世代</th>
+            <th>学習データ構成（概念）</th>
+            <th>品質の状態</th>
+          </tr>
+        </thead>
+        <tbody id="genTableBody"></tbody>
+      </table>
+      <div class="chart-source">
+        出典：Shumailov et al. "AI models collapse when trained on recursively generated data" Nature vol.631 pp.755–759 (2024)<br>
+        DOI: 10.1038/s41586-024-07566-y<br>
+        実験値：5世代でPerplexityが20〜28ポイント劣化、9世代後に無意味なテキスト（ジベリッシュ）を生成。
+      </div>
+    </div>
 
-<!-- CONCLUSION -->
-<section>
-  <div class="section-label">では、どうするか</div>
-  <h2>AIが生成できないものが<br>本物の情報になる</h2>
-
-  <div class="cards">
-    <div class="card">
-      <div class="card-icon">🧪</div>
-      <div class="card-title">実測データ</div>
-      <div class="card-desc">自分で計測した数値・実験結果。AIは持っていない。</div>
-    </div>
-    <div class="card">
-      <div class="card-icon">👤</div>
-      <div class="card-title">一人称の失敗体験</div>
-      <div class="card-desc">「やってみたら〇〇だった」はAIに再現不可能。</div>
-    </div>
-    <div class="card">
-      <div class="card-icon">📅</div>
-      <div class="card-title">時刻スタンプ付き情報</div>
-      <div class="card-desc">「2025年7月時点で確認」という時制の明示が信頼性になる。</div>
-    </div>
-    <div class="card">
-      <div class="card-icon">🔗</div>
-      <div class="card-title">ニッチな専門性</div>
-      <div class="card-desc">広く浅い情報はAIの得意領域。深く狭い専門知識はまだ人間が強い。</div>
+    <div class="note-box">
+      <strong>メカニズム：</strong>元データの分布における低確率事象（稀な専門知識・ニッチな情報）が最初に消失し、世代を経るごとに出力が「よくある表現」に収束する。論文ではこれを「統計的尾部の切り捨て」と表現しており、劣化は不可逆的であることが確認されている。
     </div>
   </div>
-</section>
 
-<div class="divider"></div>
+  <!-- SECTION 4: SEO -->
+  <div class="report-section">
+    <div class="section-num">Section 4</div>
+    <h2>Googleアルゴリズム更新による既存コンテンツへの影響</h2>
+    <p class="lead">
+      2024年3月のGoogleによる「役立つコンテンツシステム（HCU）」のコアアルゴリズム統合後、専門家が執筆したサイトを含む広範なコンテンツに影響が生じた。
+    </p>
 
-<!-- SOURCES -->
-<section>
-  <div class="section-label">出典一覧</div>
-  <h2>このページで使用したデータ</h2>
-  <ul class="sources-list">
-    <li><strong>Ahrefs (2025年5月)：</strong>74.2%の新規ウェブページにAI混入 / 90万ページ調査<br><a href="https://ahrefs.com/blog/what-percentage-of-new-content-is-ai-generated/" target="_blank">ahrefs.com/blog/what-percentage-of-new-content-is-ai-generated/</a></li>
-    <li><strong>Originality.ai 継続調査：</strong>Google検索上位のAI記事割合（2019年〜2025年）<br><a href="https://originality.ai/ai-content-in-google-search-results" target="_blank">originality.ai/ai-content-in-google-search-results</a></li>
-    <li><strong>NewsGuard AI Tracking Center：</strong>AIコンテンツファームサイト数の月次追跡<br><a href="https://www.newsguardtech.com/special-reports/ai-tracking-center/" target="_blank">newsguardtech.com/special-reports/ai-tracking-center/</a></li>
-    <li><strong>Shumailov et al. Nature 2024：</strong>"AI models collapse when trained on recursively generated data" vol.631 pp.755–759<br><a href="https://www.nature.com/articles/s41586-024-07566-y" target="_blank">nature.com/articles/s41586-024-07566-y</a></li>
-    <li><strong>Paul Teitelman (2024)：</strong>Googleアルゴリズム更新後の7,105サイト6ヶ月調査<br><a href="https://www.paulteitelman.com/a-6-month-study-of-the-potential-impact-of-googles-march-2024-helpful-content-update-on-niche-sites/" target="_blank">paulteitelman.com — HCU Impact Study</a></li>
-    <li><strong>Imperva Bad Bot Report 2025：</strong>ボットが全インターネットトラフィックの51%を占める<br><a href="https://www.imperva.com/blog/2025-imperva-bad-bot-report-how-ai-is-supercharging-the-bot-threat/" target="_blank">imperva.com/blog/2025-imperva-bad-bot-report</a></li>
-  </ul>
-  <p style="font-size:12px; color:#333; margin-top:20px;">※「検索結果シミュレーション」内の記事タイトル・説明文は傾向を示すフィクション。AIコンテンツの比率グラフはOriginality.aiの実測値。</p>
-</section>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="num">82%</div>
+        <div class="desc">調査サイトの平均トラフィック<br>減少率（中央値 97%）</div>
+        <div class="src">Paul Teitelman / 7,105サイト・6ヶ月調査</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">22%</div>
+        <div class="desc">調査サイト中トラフィックが<br>完全にゼロになった割合</div>
+        <div class="src">同調査より</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">32%</div>
+        <div class="desc">旅行サイト671件中、トラフィック<br>90%以上消失した割合</div>
+        <div class="src">Amsive分析 (2024)</div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>構造的な問題：</strong>AIが生成したコンテンツと専門家が執筆したコンテンツをアルゴリズムが識別しきれないため、双方が影響を受ける。結果として「発信しても評価されない」という状況が生まれ、専門家による一次情報の更新が減少するという悪循環が指摘されている。
+    </div>
+  </div>
+
+  <!-- SECTION 5: Conclusion -->
+  <div class="report-section">
+    <div class="section-num">Section 5</div>
+    <h2>まとめ：AIが生成しにくい情報の特徴</h2>
+    <p class="lead">
+      以上の状況を踏まえると、信頼性の高い情報として評価されやすくなるのは、AIによる再現が困難な以下の特徴を持つコンテンツと考えられる。
+    </p>
+    <ul class="conclusion-list">
+      <li>
+        <span class="icon">📊</span>
+        <div class="text"><strong>実測・一次データ</strong>自ら計測・観察・実験した数値や結果。AIは学習データに含まれる情報しか持てない。</div>
+      </li>
+      <li>
+        <span class="icon">🗓</span>
+        <div class="text"><strong>時刻スタンプ付きの情報</strong>「2026年4月時点で確認した」という時制の明示。学習データのカットオフ以降の情報はAIにない。</div>
+      </li>
+      <li>
+        <span class="icon">👤</span>
+        <div class="text"><strong>一人称の体験・失敗談</strong>「実際にやってみたら〇〇だった」という個人の体験。再現不可能な固有の情報。</div>
+      </li>
+      <li>
+        <span class="icon">🔬</span>
+        <div class="text"><strong>深いニッチ専門知識</strong>広く浅い情報はAIが得意とする領域。特定分野の深い専門性は依然として人間の優位性がある。</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SOURCES -->
+  <div class="report-section" style="border-bottom:none;">
+    <div class="section-num">References</div>
+    <h2>出典一覧</h2>
+    <ul class="sources-list" style="margin-top:24px;">
+      <li>
+        <strong>Ahrefs (2025年5月) — 新規ウェブページのAI混入率調査（90万ページ）</strong>
+        <a href="https://ahrefs.com/blog/what-percentage-of-new-content-is-ai-generated/" target="_blank">ahrefs.com/blog/what-percentage-of-new-content-is-ai-generated/</a>
+      </li>
+      <li>
+        <strong>Originality.ai — Google検索上位のAI記事割合 継続調査（2019年〜2025年）</strong>
+        <a href="https://originality.ai/ai-content-in-google-search-results" target="_blank">originality.ai/ai-content-in-google-search-results</a>
+      </li>
+      <li>
+        <strong>NewsGuard — AI Tracking Center（月次追跡 / 16言語）</strong>
+        <a href="https://www.newsguardtech.com/special-reports/ai-tracking-center/" target="_blank">newsguardtech.com/special-reports/ai-tracking-center/</a>
+      </li>
+      <li>
+        <strong>Shumailov et al. — "AI models collapse when trained on recursively generated data" Nature vol.631 (2024)</strong>
+        <a href="https://www.nature.com/articles/s41586-024-07566-y" target="_blank">nature.com/articles/s41586-024-07566-y</a>
+      </li>
+      <li>
+        <strong>Paul Teitelman (2024) — Google HCU後の7,105サイト・6ヶ月追跡調査</strong>
+        <a href="https://www.paulteitelman.com/a-6-month-study-of-the-potential-impact-of-googles-march-2024-helpful-content-update-on-niche-sites/" target="_blank">paulteitelman.com — HCU Impact Study</a>
+      </li>
+      <li>
+        <strong>Imperva — Bad Bot Report 2025（ボットトラフィック実態調査）</strong>
+        <a href="https://www.imperva.com/blog/2025-imperva-bad-bot-report-how-ai-is-supercharging-the-bot-threat/" target="_blank">imperva.com/blog/2025-imperva-bad-bot-report</a>
+      </li>
+    </ul>
+  </div>
+
+</div><!-- /report-body -->
 
 <footer>
-  <strong>情報の希釈化 — 実データで見るAIコンテンツ汚染</strong><br>
-  数値はすべて上記出典より。シミュレーション部分は出典に基づく傾向の再現。2026年4月作成。
+  AIコンテンツの増加がウェブ上の情報品質に与える影響 — 調査レポート 2026年4月<br>
+  シミュレーション部分（Section 2の検索結果例）は傾向を示すために作成した架空の記事タイトルを使用。数値はすべて上記出典による。
 </footer>
 
 <script>
-// カウンターアニメーション
-function animateCounter(el, target, suffix, duration) {
-  let start = 0;
-  const step = target / (duration / 16);
-  const timer = setInterval(() => {
-    start = Math.min(start + step, target);
-    el.textContent = Math.floor(start) + suffix;
-    if (start >= target) clearInterval(timer);
+// KEY FINDINGS カウンター
+function counter(id, target, suffix, ms) {
+  const el = document.getElementById(id);
+  let v = 0;
+  const step = target / (ms / 16);
+  const t = setInterval(() => {
+    v = Math.min(v + step, target);
+    el.textContent = Math.floor(v) + suffix;
+    if (v >= target) clearInterval(t);
   }, 16);
 }
-const obs = new IntersectionObserver((entries) => {
+const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
-      animateCounter(document.getElementById('counter1'), 74, '%', 1500);
-      animateCounter(document.getElementById('counter2'), 61, '倍', 1200);
-      animateCounter(document.getElementById('counter3'), 19, '%', 1800);
+      counter('c1', 74, '%', 1200);
+      counter('c2', 61, '倍', 1000);
+      counter('c3', 19, '%', 1400);
+      counter('c4', 82, '%', 1100);
       obs.disconnect();
     }
   });
 }, { threshold: 0.5 });
-obs.observe(document.getElementById('counter1'));
+obs.observe(document.getElementById('c1'));
 
-// NewsGuardチャート
+// NewsGuard チャート
 const ngData = [
-  { date: '2023年5月（観測開始）', count: 49 },
-  { date: '2023年6月', count: 217 },
-  { date: '2023年12月', count: 614 },
-  { date: '2024年2月', count: 725 },
-  { date: '2024年11月', count: 1121 },
-  { date: '2026年3月（最新）', count: 3006 },
+  { date: '2023年5月（開始）', count: 49, max: 3006 },
+  { date: '2023年6月', count: 217, max: 3006 },
+  { date: '2023年12月', count: 614, max: 3006 },
+  { date: '2024年2月', count: 725, max: 3006 },
+  { date: '2024年11月', count: 1121, max: 3006 },
+  { date: '2026年3月（最新）', count: 3006, max: 3006 },
 ];
-const maxCount = 3006;
 const ngEl = document.getElementById('ngChart');
 ngData.forEach(d => {
-  const pct = (d.count / maxCount * 100).toFixed(1);
+  const pct = (d.count / d.max * 100).toFixed(1);
   const row = document.createElement('div');
-  row.className = 'ng-row';
+  row.className = 'bar-row';
   row.innerHTML = `
-    <div class="ng-date">${d.date}</div>
-    <div class="ng-bar-wrap">
-      <div class="ng-bar-fill" style="width:${pct}%">${d.count >= 300 ? d.count + '件' : ''}</div>
-    </div>
-    <div class="ng-num">${d.count < 300 ? d.count + '件' : ''}</div>
+    <div class="bar-label">${d.date}</div>
+    <div class="bar-track"><div class="bar-fill-red" style="width:${pct}%">${d.count >= 300 ? d.count + '件' : ''}</div></div>
+    <div class="bar-val">${d.count < 300 ? d.count + '件' : ''}</div>
   `;
   ngEl.appendChild(row);
 });
 
-// Originality.ai 実測データ（測定点のみ）
-const yearData = [
-  { label: '2019', aiPct: 2.27,  measured: true  },
-  { label: '2021', aiPct: 5.5,   measured: false },
-  { label: '2022', aiPct: 8.3,   measured: false },
-  { label: '2023', aiPct: 12.1,  measured: false },
-  { label: '2024/11', aiPct: 18.07, measured: true },
-  { label: '2025/7', aiPct: 19.56, measured: true  },
+// 年スライダー
+const years = [
+  { label: '2019年', ai: 2.27,  measured: true },
+  { label: '2021年', ai: 5.5,   measured: false },
+  { label: '2022年', ai: 8.3,   measured: false },
+  { label: '2023年', ai: 12.1,  measured: false },
+  { label: '2024年11月', ai: 18.07, measured: true },
+  { label: '2025年7月', ai: 19.56, measured: true },
 ];
-
-const searchResults = [
-  // 2019
+const results = [
   [
-    { type:'human', badge:'専門家監修', title:'糖尿病の初期症状と早期発見のポイント', url:'diabetes-center.jp/symptoms/', desc:'口渇・多飲・頻尿・体重減少が主な初期症状。空腹時血糖値とHbA1cの定期検査が重要。' },
+    { type:'human', badge:'専門家執筆', title:'糖尿病の初期症状と早期発見のポイント', url:'diabetes-center.jp/symptoms/', desc:'口渇・多飲・頻尿・体重減少が主な初期症状。空腹時血糖値とHbA1cの定期検査が重要。' },
     { type:'human', badge:'学術機関', title:'2型糖尿病の疫学と初期症状（国立研究開発法人）', url:'ncgm.go.jp/research/dm-epidemiology', desc:'全国多施設データに基づく分析。発症から診断まで平均2.3年の遅延が課題として指摘されている。' },
-    { type:'human', badge:'患者コミュニティ', title:'気づいたきっかけ—糖尿病患者の初期症状体験談集', url:'dm-support.jp/experience/', desc:'当事者15名が語る初期症状の気づき。「夜中に何度もトイレ」「視界のかすみ」など医学書に出ない記述が多数。' },
+    { type:'human', badge:'患者コミュニティ', title:'気づいたきっかけ — 患者15名の初期症状体験談', url:'dm-support.jp/experience/', desc:'「夜中に何度もトイレ」「視界のかすみ」など当事者目線の記述。医学書に出にくい情報を含む。' },
   ],
-  // 2021
   [
-    { type:'human', badge:'専門家監修', title:'糖尿病の初期症状と早期発見のポイント', url:'diabetes-center.jp/symptoms/', desc:'口渇・多飲・頻尿・体重減少が主な初期症状。定期的な血液検査での早期発見が重要。' },
+    { type:'human', badge:'専門家執筆', title:'糖尿病の初期症状と早期発見のポイント', url:'diabetes-center.jp/symptoms/', desc:'口渇・多飲・頻尿・体重減少が主な初期症状。定期的な血液検査での早期発見が重要。' },
     { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状について知っておくべき10のこと', url:'health-article-pro.com/dm-10points', desc:'糖尿病の初期症状には様々なものがあります。本記事では糖尿病の初期症状について詳しく解説します。' },
     { type:'human', badge:'学術機関', title:'2型糖尿病の疫学と初期症状', url:'ncgm.go.jp/research/dm-epidemiology', desc:'全国データに基づく分析。発症から診断までの遅延が課題。' },
   ],
-  // 2022
   [
-    { type:'ai-gen', badge:'AI生成（推定）', title:'【完全版】糖尿病の初期症状まとめ｜見落とし厳禁', url:'health-seo-master.jp/dm-kanzen/', desc:'糖尿病の初期症状について徹底解説します。糖尿病の初期症状を早期に発見することが重要です。この記事では糖尿病の初期症状の種類や原因について詳しくご説明します。' },
-    { type:'human', badge:'専門家監修', title:'糖尿病の初期症状と早期発見のポイント', url:'diabetes-center.jp/symptoms/', desc:'口渇・多飲・頻尿・体重減少が主な症状。定期検査が重要。' },
+    { type:'ai-gen', badge:'AI生成（推定）', title:'【完全版】糖尿病の初期症状まとめ｜見落とし厳禁', url:'health-seo-master.jp/dm-kanzen/', desc:'糖尿病の初期症状について徹底解説します。糖尿病の初期症状を早期に発見することが重要です。この記事では糖尿病の初期症状の種類や原因についてご説明します。' },
+    { type:'human', badge:'専門家執筆', title:'糖尿病の初期症状と早期発見のポイント', url:'diabetes-center.jp/symptoms/', desc:'口渇・多飲・頻尿・体重減少が主な症状。定期検査が重要。' },
     { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病 初期症状 チェックリスト10選【2022年最新】', url:'medical-content-ai.net/checklist', desc:'糖尿病の初期症状をチェックリスト形式でご紹介します。当てはまる項目が多い方は医師への相談をおすすめします。' },
   ],
-  // 2023
   [
-    { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状【医師監修風】完全ガイド2023', url:'best-health-info.jp/diabetes-2023/', desc:'糖尿病の初期症状について医療の専門家が監修した情報をお届けします。糖尿病の初期症状は早期発見が重要で、適切な治療により症状の改善が期待できます。' },
-    { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状まとめ｜口渇・頻尿・体重減少を解説', url:'wellness-seo-blog.com/dm-signs/', desc:'この記事では糖尿病の主な初期症状である口渇、頻尿、体重減少について詳しく解説しています。' },
-    { type:'human', badge:'専門家監修', title:'糖尿病の初期症状と早期発見のポイント', url:'diabetes-center.jp/symptoms/', desc:'一次情報。実際の患者データに基づく解説。' },
+    { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状【医師監修風】完全ガイド2023', url:'best-health-info.jp/diabetes-2023/', desc:'糖尿病の初期症状について医療の専門家が監修した情報をお届けします。適切な治療により症状の改善が期待できます。' },
+    { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状まとめ｜口渇・頻尿・体重減少を解説', url:'wellness-seo-blog.com/dm-signs/', desc:'口渇、頻尿、体重減少について詳しく解説しています。症状が続く場合は医療機関への受診をお勧めします。' },
+    { type:'human', badge:'専門家執筆', title:'糖尿病の初期症状と早期発見のポイント', url:'diabetes-center.jp/symptoms/', desc:'一次情報。実際の患者データに基づく解説。' },
     { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状が出たら？チェックすべき10項目', url:'medical-guide-ai.net/dm-check', desc:'糖尿病の初期症状として知られる10の症状を解説します。自己判断せず医師に相談することが大切です。' },
   ],
-  // 2024/11
   [
     { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状 完全解説【2024年版】', url:'dm-guide-2024.com/symptoms/', desc:'糖尿病の初期症状について詳しく解説します。口渇・頻尿・体重減少・疲労感などが代表的な初期症状として知られています。' },
     { type:'ai-gen', badge:'AI生成（推定）', title:'【最新】糖尿病の初期症状一覧｜見逃してはいけないサイン', url:'health-ai-writer.jp/diabetes/', desc:'糖尿病は初期段階では自覚症状が少ない疾患です。しかし口渇・多飲・頻尿・体重減少などの症状が現れます。' },
     { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状と早期対応のポイントを徹底解説', url:'medical-content-hub.net/dm/', desc:'糖尿病の初期症状について徹底的に解説します。適切な行動を取ることができるようになります。' },
-    { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状チェック｜あなたは大丈夫？', url:'health-check-ai.jp/diabetes-check/', desc:'糖尿病の初期症状をご自身でチェックできるページです。以下の症状が続く場合は医療機関への受診をご検討ください。' },
-    { type:'human', badge:'専門家（更新停止）', title:'糖尿病の初期症状（最終更新：2022年）', url:'diabetes-center.jp/symptoms/', desc:'※著者は2023年以降の更新を停止。検索流入がAI記事に奪われたため発信を終了したと著者ブログで言及。' },
+    { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状チェック｜あなたは大丈夫？', url:'health-check-ai.jp/diabetes-check/', desc:'糖尿病の初期症状をご自身でチェックできるページです。症状が続く場合は医療機関への受診をご検討ください。' },
+    { type:'human', badge:'専門家（更新停止）', title:'糖尿病の初期症状（最終更新：2022年）', url:'diabetes-center.jp/symptoms/', desc:'※著者は2023年以降の更新を停止。検索流入がAI記事に奪われたため、発信を終了したと著者ブログで言及（シミュレーション）。' },
   ],
-  // 2025/7
   [
     { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状 2025年最新情報', url:'ai-health-2025.com/diabetes/', desc:'糖尿病の初期症状として知られているのは口渇・頻尿・体重減少です。症状が現れた場合は医師への相談が推奨されています。' },
     { type:'ai-gen', badge:'AI生成（推定）', title:'【医師監修】糖尿病の初期症状完全ガイド', url:'medical-ai-content.jp/dm-guide/', desc:'糖尿病の初期症状について詳しく解説します。主な症状：口渇・多飲・頻尿・体重減少・疲労感・視力の低下。' },
     { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状を見逃さないために', url:'health-guide-ai.net/dm/', desc:'糖尿病の初期症状は見逃されやすい傾向にあります。詳しくは医療機関にご相談ください。' },
     { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状 よくある質問Q&A', url:'dm-faq-generator.com/symptoms/', desc:'Q：糖尿病の初期症状はどのようなものですか？ A：口渇・頻尿・体重減少などが代表的です。' },
-    { type:'ai-gen', badge:'AI生成（推定）', title:'糖尿病の初期症状｜知っておきたい基礎知識', url:'basic-health-ai.jp/diabetes/', desc:'糖尿病の初期症状を早期に発見することで、適切な治療を開始できます。' },
-    { type:'ai-gen', badge:'AI生成（推定）', title:'初期症状 糖尿病 解説（自動生成）', url:'seo-auto-content.jp/dm/', desc:'糖尿病の初期症状について解説します。糖尿病の初期症状を理解することは重要です。' },
+    { type:'ai-gen', badge:'AI生成（推定）', title:'初期症状 糖尿病 解説', url:'seo-auto-content.jp/dm/', desc:'糖尿病の初期症状について解説します。糖尿病の初期症状を理解することは重要です。' },
   ],
 ];
 
-function updateSearch(idx) {
-  const d = yearData[idx];
+function updateSearch(i) {
+  const d = years[i];
   document.getElementById('yearDisplay').textContent = d.label;
-  const aiP = d.aiPct;
-  const humanP = 100 - aiP;
-  document.getElementById('barHuman').style.width = humanP + '%';
+  const aiP = d.ai, hP = 100 - aiP;
+  document.getElementById('barHuman').style.width = hP + '%';
   const aiEl = document.getElementById('barAi');
   aiEl.style.width = aiP + '%';
-  aiEl.style.left = humanP + '%';
-  document.getElementById('humanPct').textContent = '人間：約' + humanP.toFixed(1) + '%（推定）';
+  aiEl.style.left = hP + '%';
+  document.getElementById('humanPct').textContent = '人間：約' + hP.toFixed(1) + '%（推計）';
   document.getElementById('aiPct').textContent = 'AI：' + aiP.toFixed(2) + '%' + (d.measured ? '（実測）' : '（推計）');
-  document.getElementById('dataNoteBar').textContent = d.measured ? '✓ Originality.ai 実測値' : '〜 実測値間の推計値';
+  const badge = document.getElementById('dataBadge');
+  badge.className = 'data-badge ' + (d.measured ? 'measured' : 'estimated');
+  badge.textContent = d.measured ? '● 実測値（Originality.ai）' : '〜 実測値間の推計値';
 
   const list = document.getElementById('resultList');
   list.innerHTML = '';
-  searchResults[idx].forEach((r, i) => {
+  results[i].forEach(r => {
     const div = document.createElement('div');
     div.className = 'result-item ' + r.type;
     div.innerHTML = `
@@ -507,35 +792,33 @@ function updateSearch(idx) {
     list.appendChild(div);
   });
 }
-
-document.getElementById('yearSlider').addEventListener('input', function() {
-  updateSearch(parseInt(this.value));
-});
+document.getElementById('yearSlider').addEventListener('input', function() { updateSearch(+this.value); });
 updateSearch(0);
 
-// モデル崩壊
-const generations = [
-  { label: 'Gen 0\n（人間）', human: 95, ai: 5, status: '正常', cls: 'good' },
-  { label: 'Gen 1', human: 75, ai: 25, status: '軽微な劣化', cls: 'good' },
-  { label: 'Gen 2', human: 50, ai: 50, status: 'Perplexity↑', cls: 'warn' },
-  { label: 'Gen 3', human: 30, ai: 70, status: '顕著な劣化', cls: 'warn' },
-  { label: 'Gen 4', human: 15, ai: 85, status: '稀な知識が消失', cls: 'bad' },
-  { label: 'Gen 5', human: 5, ai: 95, status: '+20〜28pt劣化', cls: 'bad' },
-  { label: 'Gen 9\n（論文結果）', human: 1, ai: 99, status: '崩壊・無意味化', cls: 'bad' },
+// モデル崩壊テーブル
+const gens = [
+  { name: 'Gen 0（人間データ）', h: 95, a: 5,  status: '正常', cls: 'status-ok' },
+  { name: 'Gen 1', h: 75, a: 25, status: '軽微な劣化',   cls: 'status-ok' },
+  { name: 'Gen 2', h: 50, a: 50, status: 'Perplexity 上昇', cls: 'status-warn' },
+  { name: 'Gen 3', h: 30, a: 70, status: '顕著な劣化',   cls: 'status-warn' },
+  { name: 'Gen 4', h: 15, a: 85, status: '稀な知識が消失', cls: 'status-bad' },
+  { name: 'Gen 5', h: 5,  a: 95, status: '+20〜28pt 劣化', cls: 'status-bad' },
+  { name: 'Gen 9（論文実験結果）', h: 1, a: 99, status: '崩壊・無意味化', cls: 'status-bad' },
 ];
-const gbEl = document.getElementById('genBars');
-generations.forEach(g => {
-  const row = document.createElement('div');
-  row.className = 'gen-row';
-  row.innerHTML = `
-    <div class="gen-label">${g.label}</div>
-    <div class="gen-bar-wrap">
-      <div class="gen-human-fill" style="width:${g.human}%">${g.human > 15 ? '人間データ' : ''}</div>
-      <div class="gen-ai-fill" style="width:${g.ai}%; left:${g.human}%">${g.ai > 20 ? 'AI生成データ' : ''}</div>
-    </div>
-    <div class="gen-status ${g.cls}">${g.status}</div>
+const tbody = document.getElementById('genTableBody');
+gens.forEach(g => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><span class="gen-name">${g.name}</span></td>
+    <td class="gen-bar-cell">
+      <div class="gen-mini-track">
+        <div class="gen-mini-h" style="width:${g.h}%"></div>
+        <div class="gen-mini-a" style="width:${g.a}%; left:${g.h}%"></div>
+      </div>
+    </td>
+    <td class="gen-status-cell ${g.cls}">${g.status}</td>
   `;
-  gbEl.appendChild(row);
+  tbody.appendChild(tr);
 });
 </script>
 </body>
